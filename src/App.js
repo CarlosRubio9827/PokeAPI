@@ -1,23 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useState } from "react";
+import { useEffect } from "react";
+import CardPoke from "./Components/CardPoke";
+import Header from "./Components/Header";
+import Footer from "./Components/Footer";
+import { Link } from "react-router-dom";
 
 function App() {
+  // const [counter, setCounter] = useState(0);
+  const [pokemones, setPokemones] = useState([]);
+  const [next, setNext] = useState(
+    "https://pokeapi.co/api/v2/pokemon?limit=10"
+  );
+
+  const getDataAPI = async () => {
+    const res = await fetch(next);
+    const data = await res.json();
+    setNext(data.next);
+    function createPokemonObject(result) {
+      result.forEach(async (pokemon) => {
+        const res = await fetch(
+          `https://pokeapi.co/api/v2/pokemon/${pokemon.name}`
+        );
+        const data = await res.json();
+        setPokemones((currentList) => [...currentList, data]);
+      });
+    }
+    createPokemonObject(data.results);
+    await console.log(pokemones);
+  };
+
+  useEffect(() => {
+    getDataAPI();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+      <section className="pokes">
+        {pokemones.map((i, j) => {
+          return (
+            <Link state={i} className='link' to={`poke/${i.name}`} key={j}>
+              <CardPoke key={j} pokeElement={i} />;
+            </Link>
+          );
+        })}
+      </section>
+      <Footer />
     </div>
   );
 }
