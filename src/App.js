@@ -9,14 +9,15 @@ import { Link } from "react-router-dom";
 function App() {
   // const [counter, setCounter] = useState(0);
   const [pokemones, setPokemones] = useState([]);
-  const [next, setNext] = useState(
-    "https://pokeapi.co/api/v2/pokemon?limit=10"
-  );
+  const [loadMore, setLoadMore] = useState('https://pokeapi.co/api/v2/pokemon?limit=20');
+  
 
   const getDataAPI = async () => {
-    const res = await fetch(next);
+    const res = await fetch(loadMore);
     const data = await res.json();
-    setNext(data.next);
+
+    setLoadMore(data.next);
+
     function createPokemonObject(result) {
       result.forEach(async (pokemon) => {
         const res = await fetch(
@@ -34,6 +35,11 @@ function App() {
     getDataAPI();
   }, []);
 
+  const funcLoadMore = ()=>{
+    getDataAPI();
+    console.log('load More');
+  }
+
   return (
     <div className="App">
       <Header />
@@ -46,6 +52,7 @@ function App() {
           );
         })}
       </section>
+      <button className="load-more" onClick={funcLoadMore}>Cargar más!</button>
       <Footer />
     </div>
   );
